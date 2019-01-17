@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">20190117</string>
+    <string name="editButton">Edit</string>
+    <string name="logButton">Log</string>
+    <string name="timetitle">Time</string>
+    <string name="alltimetitle">runTime</string>
+    <string name="steptimetitle">stepTime</string>
+    <string name="setting">Setting</string>
+    <string name="settingtitle">settingtitle</string>
+    <string name="settingunit">unit</string>
+    <string name="timeUnit">s</string>
+</resources>

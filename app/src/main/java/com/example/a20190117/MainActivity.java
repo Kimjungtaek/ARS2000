@@ -1,0 +1,529 @@
+package com.example.a20190117;
+
+import android.content.DialogInterface;
+import android.os.Build;
+import android.os.Handler;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ViewAnimator;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class MainActivity extends AppCompatActivity {
+    Handler mHandler = new Handler();
+    Status status;
+    Monitor monitor;
+    Log log;
+    Password password;
+    Edit edit;
+    TimeMeasureTimer timeMeasureTimer;
+    Setting setting;
+    ButtonListener buttonListener;
+
+    enum State{ready, running, pause}
+    State state = State.ready;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        status = new Status(R.id.status);
+        monitor = new Monitor(R.id.monitor);
+        log = new Log(R.id.logFrame);
+        password = new Password(R.id.passwordFrame);
+        edit = new Edit(R.id.settingFrame);
+        timeMeasureTimer = new TimeMeasureTimer(R.id.timemeasure);
+        setting = new Setting();
+        buttonListener = new ButtonListener();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasfocus) {
+        super.onWindowFocusChanged(hasfocus);
+        if(hasfocus){
+            View decorView = getWindow().getDecorView();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {  //KITKAT 이상 버전에서만
+                decorView.setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                );
+            }
+        }
+    }
+
+    //에러 표시 dialog
+    private void error(String errorText) {
+        //모두 정지
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setTitle("Error")
+                .setMessage("error : " + errorText)
+                .setCancelable(false)
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        //다시 시작
+                    }
+                /*
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                */
+                });
+        alertDialogBuilder.show();
+    }
+
+    //왼쪽 메뉴 버튼마다 frame 변경
+    private void setFrame(int child){
+        View monitorFrame = (View) findViewById(R.id.monitorFrame);
+        View logFrame = (View) findViewById(R.id.logFrame);
+        View passwordFrame = (View) findViewById(R.id.passwordFrame);
+        View settingFrame = (View) findViewById(R.id.settingFrame);
+
+        ImageButton monitorButton = findViewById(R.id.monitorButton);
+        ImageButton logButton = findViewById(R.id.logButton);
+        ImageButton settingButton = findViewById(R.id.settingButton);
+
+        TextView monitorText = findViewById(R.id.monitortext);
+        TextView logText = findViewById(R.id.logtext);
+        TextView settingText = findViewById(R.id.settingtext);
+
+        monitorFrame.setVisibility(View.INVISIBLE);
+        monitorButton.setBackgroundResource(R.drawable.round_pie_chart_unclicked);
+        monitorText.setVisibility(View.INVISIBLE);
+        logFrame.setVisibility(View.INVISIBLE);
+        logButton.setBackgroundResource(R.drawable.round_log_unclicked);
+        passwordFrame.setVisibility(View.INVISIBLE);
+        logText.setVisibility(View.INVISIBLE);
+        settingButton.setBackgroundResource(R.drawable.round_settings_unclicked);
+        settingFrame.setVisibility(View.INVISIBLE);
+        settingText.setVisibility(View.INVISIBLE);
+
+        switch(child){
+            case 0:
+                monitorFrame.setVisibility(View.VISIBLE);
+                monitorButton.setBackgroundResource(R.drawable.round_pie_chart_clicked);
+                monitorText.setVisibility(View.VISIBLE);
+                break;
+            case 1:
+                logFrame.setVisibility(View.VISIBLE);
+                logButton.setBackgroundResource(R.drawable.round_log_clicked);
+                logText.setVisibility(View.VISIBLE);
+                break;
+            case 2:
+                passwordFrame.setVisibility(View.VISIBLE);
+                settingButton.setBackgroundResource(R.drawable.round_settings_clicked);
+                settingText.setVisibility(View.VISIBLE);
+                break;
+            case 3:
+                settingFrame.setVisibility(View.VISIBLE);
+                settingButton.setBackgroundResource(R.drawable.round_settings_clicked);
+                settingText.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    //FG, BG, pause, cancel 버튼에 반응해서 상태 변경 및 실행
+    private void changeState(State state){
+        if(state == State.ready){
+            log.add('i', "main", "All process is stoped");
+            //멈추었을 때 행동
+            timeMeasureTimer.stop();
+            this.state = State.ready;
+        }
+        else if(state == State.pause){
+            log.add('i', "main", "Process is paused");
+            //일시정지 했을 때 행동
+            timeMeasureTimer.pause();
+            this.state = State.pause;
+        }
+        else if(timeMeasureTimer.isRunning()){
+            log.add('i', "main", "Process is resumed");
+            //일시정지에서 계속 동작했을 때 행동
+            timeMeasureTimer.resume();
+            this.state = State.running;
+        }
+        else {
+            log.add('i', "main", "Process is started");
+            //처음 시작했을 때 행동
+            timeMeasureTimer.start();
+            this.state = State.running;
+        }
+    }
+
+    class Status {
+        View view;
+
+        public Status(int id){
+            view = findViewById(id);
+        }
+    }
+
+    class Monitor implements Button.OnClickListener {
+        View monitor;
+        Button left, right;
+        ViewAnimator animator;
+
+        public Monitor(int id){
+            monitor = (View) findViewById(id);
+
+            left = (Button) monitor.findViewById(R.id.leftButton);
+            left.setOnClickListener(this);
+
+            right = (Button) monitor.findViewById(R.id.rightButton);
+            right.setOnClickListener(this);
+
+            animator = (ViewAnimator) monitor.findViewById(R.id.animator);
+            buttonReveal();
+        }
+
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.leftButton :
+                    animator.setInAnimation(AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.slide_in_left));
+                    animator.setOutAnimation(AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.slide_out_right));
+                    animator.showPrevious();
+                    buttonReveal();
+                    break;
+                case R.id.rightButton :
+                    animator.setInAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_in_right));
+                    animator.setOutAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_out_left));
+                    animator.showNext();
+                    buttonReveal();
+                    break;
+            }
+        }
+
+        private void buttonReveal(){
+            if(animator.getDisplayedChild() == 0) left.setVisibility(View.GONE);
+            else if(animator.getDisplayedChild() == 4) right.setVisibility(View.GONE);
+            if(animator.getDisplayedChild() != 0 && left.getVisibility() == View.GONE) left.setVisibility(View.VISIBLE);
+            if(animator.getDisplayedChild() != 4 && right.getVisibility() == View.GONE) right.setVisibility(View.VISIBLE);
+        }
+
+        public void show(int index){
+            if(index > animator.getDisplayedChild()){
+                animator.setInAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_in_right));
+                animator.setOutAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_out_left));
+                animator.setDisplayedChild(index);
+            } else if (index < animator.getDisplayedChild()){
+                animator.setInAnimation(AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.slide_in_left));
+                animator.setOutAnimation(AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.slide_out_right));
+                animator.setDisplayedChild(index);
+            }
+        }
+    }
+
+    class Log {
+        View view;
+        TextView text;
+
+        public Log(int id){
+            view = findViewById(id);
+            text = view.findViewById(R.id.log);
+            text.setMovementMethod(new ScrollingMovementMethod());
+        }
+
+        public void add(char tag, String ab, String content){
+            Date date = new Date();
+            SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss");
+            String formatDate = sdfNow.format(date);
+
+            text.setText(text.getText() + "\n"+ tag + ")[" + formatDate + "] " + ab +" : " + content);
+        }
+    }
+
+    class Password implements Button.OnClickListener {
+        final String password = "1234";
+
+        View view;
+        EditText text;
+        Button confirm, cancel;
+
+        public Password(int id) {
+            view = (View) findViewById(id);
+            text = (EditText) view.findViewById(R.id.edittext);
+            text.setOnKeyListener(new View.OnKeyListener(){
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event){
+                    if((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)){
+                        if(text.getText().toString().compareTo(password) == 0){
+                            text.setText("");
+                            setFrame(3);
+                        }
+                        else {
+                            error("Password is not correct.");
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            });
+            confirm = (Button) view.findViewById(R.id.confirm);
+            confirm.setOnClickListener(this);
+            cancel = (Button) view.findViewById(R.id.cancel);
+            cancel.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.confirm:
+                    if(text.getText().toString().compareTo(password) == 0){
+                        text.setText("");
+                        setFrame(3);
+                    }
+                    else {
+                        error("Password is not correct.");
+                    }
+                    break;
+                case R.id.cancel:
+                    setFrame(0);
+                    break;
+            }
+        }
+    }
+
+    class Edit {
+        View view;
+        public Edit(int id){
+            view = findViewById(id);
+        }
+    }
+
+    class TimeMeasureTimer{
+        View view;
+        Timer mTimer;
+        TextView stepTime, runTime;
+        Date step, run, pause;
+
+        boolean running = false;
+
+        public TimeMeasureTimer(int id){
+            view = (View) findViewById(id);
+            stepTime = (TextView) view.findViewById(R.id.steptime);
+            runTime = (TextView) view.findViewById(R.id.runtime);
+
+            stepTime.setText("0");
+            runTime.setText("0");
+        }
+
+        public void setstepStart(){
+            stepTime.setText("0");
+            step = new Date();
+        }
+
+        public void setrunStart(){
+            runTime.setText("0");
+            run = new Date();
+        }
+
+        public void start(){
+            running = true;
+            mTimer = new Timer();
+            setstepStart();
+            setrunStart();
+            mTimer.schedule(new ThisTimerTask(), 10, 1000);
+        }
+
+        public void pause(){
+            pause = new Date();
+            mTimer.cancel();
+        }
+
+        public void resume(){
+            Date present = new Date();
+            step.setTime(step.getTime() + present.getTime() - pause.getTime());
+            run.setTime(step.getTime() + present.getTime() - pause.getTime());
+            mTimer = new Timer();
+            mTimer.schedule(new ThisTimerTask(), 10, 1000);
+        }
+
+        public void stop(){
+            running = false;
+            mTimer.cancel();
+        }
+
+        public boolean isRunning(){
+            return running;
+        }
+
+        class ThisTimerTask extends TimerTask{
+            public void run() {
+                mHandler.post(new Runnable() {
+                    public void run() {
+                        Date rightNow = new Date();
+                        long stepT = (rightNow.getTime() - step.getTime()) / 1000;
+                        long runT = (rightNow.getTime() - step.getTime()) / 1000;
+
+                        stepTime.setText(String.valueOf(stepT));
+                        runTime.setText(String.valueOf(runT));
+                    }
+                });
+            }
+        }
+    }
+
+    class Setting{
+        View heatting;
+        View temper;
+        View height;
+
+        public Setting(){
+            heatting = (View) findViewById(R.id.heattingtime);
+            View heattingColorView = (View) heatting.findViewById(R.id.colorview);
+            heattingColorView.setBackgroundColor(getResources().getColor(R.color.colorGreenDark));
+            TextView heattingTitle = (TextView) heatting.findViewById(R.id.settingtitle);
+            heattingTitle.setText("Heatting Time");
+            TextView heattingValue = (TextView) heatting.findViewById(R.id.settingvalue);
+            heattingValue.setText("0");
+            TextView heattingUnit = (TextView) heatting.findViewById(R.id.settingunit);
+            heattingUnit.setText("s");
+
+            temper = (View) findViewById(R.id.temperature);
+            View temperColorView = (View) temper.findViewById(R.id.colorview);
+            temperColorView.setBackgroundColor(getResources().getColor(R.color.colorGreen));
+            TextView temperTitle = (TextView) temper.findViewById(R.id.settingtitle);
+            temperTitle.setText("Temperature");
+            TextView temperValue = (TextView) temper.findViewById(R.id.settingvalue);
+            temperValue.setText("0");
+            TextView temperUnit = (TextView) temper.findViewById(R.id.settingunit);
+            temperUnit.setText("°C");
+
+            height = (View) findViewById(R.id.disassemblyheight);
+            View heightColorView = (View) height.findViewById(R.id.colorview);
+            heightColorView.setBackgroundColor(getResources().getColor(R.color.colorGreenWhite));
+            TextView heightTitle = (TextView) height.findViewById(R.id.settingtitle);
+            heightTitle.setText("Disassembly Height");
+            TextView heightValue = (TextView) height.findViewById(R.id.settingvalue);
+            heightValue.setText("0");
+            TextView heightUnit = (TextView) height.findViewById(R.id.settingunit);
+            heightUnit.setText("mm");
+        }
+    }
+
+    class ButtonListener implements Button.OnClickListener {
+        ImageButton monitorButton, editButton, logButton;
+        ImageButton inButton, outButton;
+        Button aButton, bButton;
+
+        public ButtonListener(){
+            monitorButton = findViewById(R.id.monitorButton);
+            monitorButton.setOnClickListener(this);
+            logButton = findViewById(R.id.logButton);
+            logButton.setOnClickListener(this);
+            editButton = findViewById(R.id.settingButton);
+            editButton.setOnClickListener(this);
+            inButton = findViewById(R.id.inButton);
+            inButton.setOnClickListener(this);
+            outButton = findViewById(R.id.outButton);
+            outButton.setOnClickListener(this);
+            aButton = findViewById(R.id.buttonA);
+            aButton.setOnClickListener(this);
+            bButton = findViewById(R.id.buttonB);
+            bButton.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view){
+            switch(view.getId()) {
+                case R.id.monitorButton :
+                    setFrame(0);
+                    break;
+                case R.id.logButton :
+                    setFrame(1);
+                    break;
+                case R.id.settingButton :
+                    if(state == State.running || state == State.pause){
+                        error("작업 진행중에는 변경할 수 없습니다.");
+                    }
+                    else{
+                        setFrame(2);
+                    }
+                    break;
+                case R.id.inButton :
+                    break;
+                case R.id.outButton :
+                    break;
+                case R.id.buttonA :
+                    buttonAonClick();
+                    break;
+                case R.id.buttonB :
+                    buttonBonClick();
+                    break;
+            }
+        }
+
+        private void buttonAonClick(){
+            if(state == State.ready){
+                log.add('i', "buttonA", "FG button is pushed");
+                aButton.setText("");
+                bButton.setText("");
+                aButton.setBackgroundResource(R.drawable.round_pause_circle);
+                bButton.setBackgroundResource(R.drawable.outline_cancel);
+                changeState(State.running);
+            } else if(state == State.running){
+                log.add('i', "buttonA", "Pause button is pushed");
+                aButton.setText("");
+                bButton.setText("");
+                aButton.setBackgroundResource(R.drawable.outline_play_circle);
+                bButton.setBackgroundResource(R.drawable.outline_cancel);
+                changeState(State.pause);
+            } else{
+                log.add('i', "buttonA", "Resume button is pushed");
+                aButton.setText("");
+                bButton.setText("");
+                aButton.setBackgroundResource(R.drawable.round_pause_circle);
+                bButton.setBackgroundResource(R.drawable.outline_cancel);
+                changeState(State.running);
+            }
+        }
+
+        private void buttonBonClick(){
+            if(state == State.ready){
+                log.add('i', "buttonB", "BG button is pushed");
+                aButton.setText("");
+                bButton.setText("");
+                aButton.setBackgroundResource(R.drawable.round_pause_circle);
+                bButton.setBackgroundResource(R.drawable.outline_cancel);
+                changeState(State.running);
+            } else if(state == State.running){
+                log.add('i', "buttonB", "Stop button is pushed");
+                aButton.setText("FG");
+                bButton.setText("Bg");
+                aButton.setBackgroundResource(R.drawable.baseline);
+                bButton.setBackgroundResource(R.drawable.baseline);
+                changeState(State.ready);
+            } else{
+                log.add('i', "buttonB", "Stop button is pushed");
+                aButton.setText("FG");
+                bButton.setText("Bg");
+                aButton.setBackgroundResource(R.drawable.baseline);
+                bButton.setBackgroundResource(R.drawable.baseline);
+                changeState(State.ready);
+            }
+        }
+    }
+}

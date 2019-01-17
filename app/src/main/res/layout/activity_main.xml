@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorMainBackGround"
+    android:padding="10dp"
+    android:orientation="vertical" >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="60dp"
+            android:orientation="vertical">
+            <RelativeLayout
+                android:layout_width="60dp"
+                android:layout_height="70dp"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/monitorButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/round_pie_chart_clicked"/>
+                <TextView
+                    android:id="@+id/monitortext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/monitorButton"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="-8dp"
+                    android:text="Monitor"
+                    android:textColor="@color/buttonclicked"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="60dp"
+                android:layout_height="70dp"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/logButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/round_log_unclicked"/>
+                <TextView
+                    android:id="@+id/logtext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/logButton"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="-8dp"
+                    android:visibility="invisible"
+                    android:text="Log"
+                    android:textColor="@color/buttonclicked"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="60dp"
+                android:layout_height="70dp"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/settingButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/round_settings_unclicked"/>
+                <TextView
+                    android:id="@+id/settingtext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/settingButton"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="-8dp"
+                    android:visibility="invisible"
+                    android:text="Setting"
+                    android:textColor="@color/buttonclicked"/>
+            </RelativeLayout>
+        </LinearLayout>
+        <FrameLayout
+            android:id="@+id/mainframe"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
+            <include layout="@layout/logframe"
+                android:id="@+id/logFrame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible"/>
+
+            <include layout="@layout/passwordframe"
+                android:id="@+id/passwordFrame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible"/>
+
+            <include layout="@layout/settingframe"
+                android:id="@+id/settingFrame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible"/>
+
+            <LinearLayout
+                android:id="@+id/monitorFrame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <include layout="@layout/status"
+                    android:id="@+id/status"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+                <include layout="@layout/monitor"
+                    android:id="@+id/monitor"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="20dp"/>
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:orientation="vertical"
+            android:background="@drawable/primaryborder">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="@string/timetitle"
+                android:textColor="@color/colorPrimaryText"
+                android:textSize="20sp"/>
+            <include layout="@layout/timemeasure"
+                android:id="@+id/timemeasure"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp" />
+            <include layout="@layout/vertical_line"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="@string/setting"
+                android:textColor="@color/colorPrimaryText"
+                android:textSize="20sp"/>
+            <include layout="@layout/setting"
+                android:id="@+id/heattingtime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp" />
+            <include layout="@layout/setting"
+                android:id="@+id/temperature"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp" />
+            <include layout="@layout/setting"
+                android:id="@+id/disassemblyheight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp" />
+            <include layout="@layout/vertical_line"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+            </RelativeLayout>
+            <include layout="@layout/vertical_line"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+                <ImageButton
+                    android:id="@+id/inButton"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:src="@drawable/round_arrow_upward"
+                    android:background="@drawable/baseline"/>
+                <ImageButton
+                    android:id="@+id/outButton"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:src="@drawable/round_arrow_downward"
+                    android:background="@drawable/baseline"/>
+                <Button
+                    android:id="@+id/buttonA"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/baseline"
+                    android:text="FG"
+                    android:textColor="#B1B1B6"
+                    android:textSize="30dp"/>
+                <Button
+                    android:id="@+id/buttonB"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/baseline"
+                    android:text="BG"
+                    android:textColor="#B1B1B6"
+                    android:textSize="30dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
