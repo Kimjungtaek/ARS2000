@@ -85,44 +85,7 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp">
-            <include layout="@layout/logframe"
-                android:id="@+id/logFrame"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="invisible"/>
-
-            <include layout="@layout/passwordframe"
-                android:id="@+id/passwordFrame"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="invisible"/>
-
-            <include layout="@layout/settingframe"
-                android:id="@+id/settingFrame"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="invisible"/>
-
-            <LinearLayout
-                android:id="@+id/monitorFrame"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                <include layout="@layout/status"
-                    android:id="@+id/status"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
-                <include layout="@layout/monitor"
-                    android:id="@+id/monitor"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:layout_marginTop="20dp"/>
-            </LinearLayout>
-
-        </FrameLayout>
+            android:layout_marginRight="10dp" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -152,17 +115,17 @@
                 android:text="@string/setting"
                 android:textColor="@color/colorPrimaryText"
                 android:textSize="20sp"/>
-            <include layout="@layout/setting"
+            <include layout="@layout/value"
                 android:id="@+id/heattingtime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp" />
-            <include layout="@layout/setting"
+            <include layout="@layout/value"
                 android:id="@+id/temperature"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp" />
-            <include layout="@layout/setting"
+            <include layout="@layout/value"
                 android:id="@+id/disassemblyheight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
