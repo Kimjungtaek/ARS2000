@@ -18,6 +18,8 @@ public class Password extends Fragment {
     Button confirm;
     ButtonListener buttonListener = new ButtonListener();
 
+    private Callback callback;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         view = inflater.inflate(R.layout.passwordframe, container, false);
@@ -36,6 +38,8 @@ public class Password extends Fragment {
         confirm = (Button) view.findViewById(R.id.confirm);
         confirm.setOnClickListener(buttonListener);
 
+        callback = (Callback) getActivity();
+
         return view;
     }
 
@@ -46,9 +50,11 @@ public class Password extends Fragment {
             if(text.getText().toString().compareTo(password) == 0){
                 text.setText("");
                 // 비밀번호 correct 반응
+                callback.setMonitor(3);
             }
             else {
-                // 비밀번호 correct 반응
+                // 비밀번호 error 반응
+                callback.error("비밀번호가 틀렸습니다.");
             }
         }
     }
