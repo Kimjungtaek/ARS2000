@@ -9,9 +9,7 @@ import android.view.ViewGroup;
 public class Setting extends Fragment {
     View view;
 
-    double heat = 11.1;
-    double temp = 22.2;
-    double disassembly = 33.3;
+    double xSetting, ySetting, zSetting, temp;
 
     Callback callback;
 
@@ -21,13 +19,27 @@ public class Setting extends Fragment {
 
         callback = (Callback) getActivity();
 
-        //파일 저장 된 값 불러오기
-        setValues();
+        getValues();
+        dataToMain();
 
         return view;
     }
 
+    //메인에 저장하라 전송
+    private void dataToMain(){
+        callback.setValue(xSetting, ySetting, zSetting, temp);
+    }
+
+    //파일로 저장된 값 불러오기
+    private void getValues(){
+        //밑 2줄은 임시 0으로 초기화
+        xSetting = ySetting = zSetting = temp = 0;
+    }
+
+    //파일로 저장 하는 함수 xml 저장 버튼에 반응
     private void setValues(){
-        callback.setValue(heat, temp, disassembly);
+        //텍스트들 읽어서 파일로 저장
+        getValues();
+        dataToMain();
     }
 }

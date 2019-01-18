@@ -18,12 +18,13 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements Callback{
     Handler mHandler = new Handler();
-    Monitor monitor;
+
     Log log;
     Password password;
+    Value value;
+    Monitor monitor;
     Setting setting;
     TimeMeasureTimer timeMeasureTimer;
-    Value value;
     ButtonListener buttonListener;
 
     enum State{ready, running, pause}
@@ -34,12 +35,12 @@ public class MainActivity extends AppCompatActivity implements Callback{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        value = new Value();
         monitor = new Monitor();
+        setting = new Setting();
         log = new Log();
         password = new Password();
-        setting = new Setting();
         timeMeasureTimer = new TimeMeasureTimer(R.id.timemeasure);
-        value = new Value();
         buttonListener = new ButtonListener();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -151,8 +152,9 @@ public class MainActivity extends AppCompatActivity implements Callback{
         alertDialogBuilder.show();
     }
 
-    public void setValue(double heat, double temp, double disassembly){
-        value.setValues(heat, temp, disassembly);
+    public void setValue(double xSetting, double ySetting, double zSetting, double temp){
+        value.setValue(xSetting, ySetting, zSetting, temp);
+        monitor.setValue(xSetting, ySetting, zSetting, temp);
     }
 
     //FG, BG, pause, cancel 버튼에 반응해서 상태 변경 및 실행
@@ -257,20 +259,11 @@ public class MainActivity extends AppCompatActivity implements Callback{
     }
 
     class Value{
-        View heatting, temper, height;
-        TextView heattingValue, temperValue, heightValue;
-        double heat, temp, disassembly;
+        View temper, height;
+        TextView temperValue, heightValue;
+        double xSetting, ySetting, zSetting, temp;
 
         public Value(){
-            heatting = (View) findViewById(R.id.heattingtime);
-            View heattingColorView = (View) heatting.findViewById(R.id.colorview);
-            heattingColorView.setBackgroundColor(getResources().getColor(R.color.colorGreenDark));
-            TextView heattingTitle = (TextView) heatting.findViewById(R.id.settingtitle);
-            heattingTitle.setText("Heatting Time");
-            heattingValue = (TextView) heatting.findViewById(R.id.settingvalue);
-            TextView heattingUnit = (TextView) heatting.findViewById(R.id.settingunit);
-            heattingUnit.setText("s");
-
             temper = (View) findViewById(R.id.temperature);
             View temperColorView = (View) temper.findViewById(R.id.colorview);
             temperColorView.setBackgroundColor(getResources().getColor(R.color.colorGreen));
@@ -290,14 +283,14 @@ public class MainActivity extends AppCompatActivity implements Callback{
             heightUnit.setText("mm");
         }
 
-        public void setValues(double heat, double temp, double disassembly){
-            this.heat = heat;
+        public void setValue(double xSetting, double ySetting, double zSetting, double temp){
+            this.xSetting = xSetting;
+            this.ySetting = ySetting;
+            this.zSetting = zSetting;
             this.temp = temp;
-            this.disassembly = disassembly;
 
-            heattingValue.setText(Double.toString(heat));
             temperValue.setText(Double.toString(temp));
-            heightValue.setText(Double.toString(disassembly));
+            heightValue.setText(Double.toString(zSetting));
         }
     }
 

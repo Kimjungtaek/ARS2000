@@ -44,6 +44,13 @@ public class Monitor extends Fragment {
         return view;
     }
 
+    public void setValue(double xSetting, double ySetting, double zSetting, double temp){
+        fixing.set(xSetting, ySetting);
+        //release.set(xSetting, ySetting);
+        //heating.set(temp);
+        //disassembly.set(zSetting);
+    }
+
     public void setMeasure(int n){
         FragmentTransaction childFt = getChildFragmentManager().beginTransaction();
 
