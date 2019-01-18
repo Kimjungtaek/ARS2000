@@ -116,11 +116,6 @@
                 android:textColor="@color/colorPrimaryText"
                 android:textSize="20sp"/>
             <include layout="@layout/value"
-                android:id="@+id/heattingtime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp" />
-            <include layout="@layout/value"
                 android:id="@+id/temperature"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -44,6 +44,14 @@ public class Monitor extends Fragment {
         return view;
     }
 
+    public void setValue(double xSetting, double ySetting, double zSetting, double temp){
+        fixing.set(xSetting, ySetting);
+        heating.set(temp);
+        //vacuum 압력값이 필요하면 래퍼런스랑 함수 추가
+        disassembly.set(zSetting);
+        release.set(xSetting, ySetting);
+    }
+
     public void setMeasure(int n){
         FragmentTransaction childFt = getChildFragmentManager().beginTransaction();
 
