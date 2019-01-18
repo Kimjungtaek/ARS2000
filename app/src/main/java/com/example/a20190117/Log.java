@@ -13,8 +13,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Log extends Fragment {
+    static Log log;
     View view;
     TextView text;
+
+    public Log(){
+        log = this;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -25,11 +30,15 @@ public class Log extends Fragment {
         return view;
     }
 
-    public void add(char tag, String ab, String content){
+    public static void add(char tag, String ab, String content) {
         Date date = new Date();
         SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss");
         String formatDate = sdfNow.format(date);
 
-        text.setText(text.getText() + "\n"+ tag + ")[" + formatDate + "] " + ab +" : " + content);
+        getLog().text.setText(getLog().text.getText() + "\n" + tag + ")[" + formatDate + "] " + ab + " : " + content);
+    }
+
+    private static Log getLog(){
+        return log;
     }
 }

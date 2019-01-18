@@ -3,19 +3,14 @@ package com.example.a20190117;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Handler;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.ViewAnimator;
 
 import java.util.Date;
 import java.util.Timer;
@@ -23,13 +18,12 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     Handler mHandler = new Handler();
-    Status status;
     Monitor monitor;
     Log log;
     Password password;
-    Edit edit;
+    Setting setting;
     TimeMeasureTimer timeMeasureTimer;
-    Value setting;
+    Value value;
     ButtonListener buttonListener;
 
     enum State{ready, running, pause}
@@ -40,16 +34,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        status = new Status(R.id.status);
-        monitor = new Monitor(R.id.monitor);
+        monitor = new Monitor();
         log = new Log();
         password = new Password();
-        edit = new Edit(R.id.settingFrame);
+        setting = new Setting();
         timeMeasureTimer = new TimeMeasureTimer(R.id.timemeasure);
-        setting = new Value();
+        value = new Value();
         buttonListener = new ButtonListener();
 
-        setFrag(0);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.mainframe, monitor)
+                .add(R.id.mainframe, log)
+                .add(R.id.mainframe, password)
+                .add(R.id.mainframe, setting)
+                .commit();
+        setMonitor(0);
     }
 
     @Override
@@ -70,9 +69,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void setFrag(int n){
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction tran = fm.beginTransaction();
+    public void setMonitor(int n){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
         ImageButton monitorButton = findViewById(R.id.monitorButton);
         ImageButton logButton = findViewById(R.id.logButton);
@@ -93,24 +91,38 @@ public class MainActivity extends AppCompatActivity {
             case 0:
                 monitorButton.setBackgroundResource(R.drawable.round_pie_chart_clicked);
                 monitorText.setVisibility(View.VISIBLE);
+                ft.show(monitor)
+                        .hide(log)
+                        .hide(password)
+                        .hide(setting)
+                        .commit();
                 break;
             case 1:
                 logButton.setBackgroundResource(R.drawable.round_log_clicked);
                 logText.setVisibility(View.VISIBLE);
-                tran.replace(R.id.mainframe, log);
-                tran.commit();
+                ft.show(log)
+                        .hide(monitor)
+                        .hide(password)
+                        .hide(setting)
+                        .commit();
                 break;
             case 2:
                 settingButton.setBackgroundResource(R.drawable.round_settings_clicked);
                 settingText.setVisibility(View.VISIBLE);
-                tran.replace(R.id.mainframe, password);
-                tran.commit();
+                ft.show(password)
+                        .hide(monitor)
+                        .hide(log)
+                        .hide(setting)
+                        .commit();
                 break;
             case 3:
                 settingButton.setBackgroundResource(R.drawable.round_settings_clicked);
                 settingText.setVisibility(View.VISIBLE);
-                //tran.replace(R.id.mainframe, setting);
-                tran.commit();
+                ft.show(setting)
+                        .hide(monitor)
+                        .hide(log)
+                        .hide(password)
+                        .commit();
                 break;
         }
     }
@@ -142,99 +154,28 @@ public class MainActivity extends AppCompatActivity {
     //FG, BG, pause, cancel 버튼에 반응해서 상태 변경 및 실행
     private void changeState(State state){
         if(state == State.ready){
-            log.add('i', "main", "All process is stoped");
+            Log.add('i', "main", "All process is stoped");
             //멈추었을 때 행동
             timeMeasureTimer.stop();
             this.state = State.ready;
         }
         else if(state == State.pause){
-            log.add('i', "main", "Process is paused");
+            Log.add('i', "main", "Process is paused");
             //일시정지 했을 때 행동
             timeMeasureTimer.pause();
             this.state = State.pause;
         }
         else if(timeMeasureTimer.isRunning()){
-            log.add('i', "main", "Process is resumed");
+            Log.add('i', "main", "Process is resumed");
             //일시정지에서 계속 동작했을 때 행동
             timeMeasureTimer.resume();
             this.state = State.running;
         }
         else {
-            log.add('i', "main", "Process is started");
+            Log.add('i', "main", "Process is started");
             //처음 시작했을 때 행동
             timeMeasureTimer.start();
             this.state = State.running;
-        }
-    }
-
-    class Status {
-        View view;
-
-        public Status(int id){
-            view = findViewById(id);
-        }
-    }
-
-    class Monitor implements Button.OnClickListener {
-        View monitor;
-        Button left, right;
-        ViewAnimator animator;
-
-        public Monitor(int id){
-            monitor = (View) findViewById(id);
-
-            left = (Button) monitor.findViewById(R.id.leftButton);
-            left.setOnClickListener(this);
-
-            right = (Button) monitor.findViewById(R.id.rightButton);
-            right.setOnClickListener(this);
-
-            animator = (ViewAnimator) monitor.findViewById(R.id.animator);
-            buttonReveal();
-        }
-
-        @Override
-        public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.leftButton :
-                    animator.setInAnimation(AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.slide_in_left));
-                    animator.setOutAnimation(AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.slide_out_right));
-                    animator.showPrevious();
-                    buttonReveal();
-                    break;
-                case R.id.rightButton :
-                    animator.setInAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_in_right));
-                    animator.setOutAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_out_left));
-                    animator.showNext();
-                    buttonReveal();
-                    break;
-            }
-        }
-
-        private void buttonReveal(){
-            if(animator.getDisplayedChild() == 0) left.setVisibility(View.GONE);
-            else if(animator.getDisplayedChild() == 4) right.setVisibility(View.GONE);
-            if(animator.getDisplayedChild() != 0 && left.getVisibility() == View.GONE) left.setVisibility(View.VISIBLE);
-            if(animator.getDisplayedChild() != 4 && right.getVisibility() == View.GONE) right.setVisibility(View.VISIBLE);
-        }
-
-        public void show(int index){
-            if(index > animator.getDisplayedChild()){
-                animator.setInAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_in_right));
-                animator.setOutAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_out_left));
-                animator.setDisplayedChild(index);
-            } else if (index < animator.getDisplayedChild()){
-                animator.setInAnimation(AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.slide_in_left));
-                animator.setOutAnimation(AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.slide_out_right));
-                animator.setDisplayedChild(index);
-            }
-        }
-    }
-
-    class Edit {
-        View view;
-        public Edit(int id){
-            view = findViewById(id);
         }
     }
 
@@ -375,18 +316,13 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View view){
             switch(view.getId()) {
                 case R.id.monitorButton :
-                    setFrag(0);
+                    setMonitor(0);
                     break;
                 case R.id.logButton :
-                    setFrag(1);
+                    setMonitor(1);
                     break;
                 case R.id.settingButton :
-                    if(state == State.running || state == State.pause){
-                        error("작업 진행중에는 변경할 수 없습니다.");
-                    }
-                    else{
-                        setFrag(2);
-                    }
+                    setMonitor(2);
                     break;
                 case R.id.inButton :
                     break;
@@ -403,21 +339,21 @@ public class MainActivity extends AppCompatActivity {
 
         private void buttonAonClick(){
             if(state == State.ready){
-                log.add('i', "buttonA", "FG button is pushed");
+                Log.add('i', "buttonA", "FG button is pushed");
                 aButton.setText("");
                 bButton.setText("");
                 aButton.setBackgroundResource(R.drawable.round_pause_circle);
                 bButton.setBackgroundResource(R.drawable.outline_cancel);
                 changeState(State.running);
             } else if(state == State.running){
-                log.add('i', "buttonA", "Pause button is pushed");
+                Log.add('i', "buttonA", "Pause button is pushed");
                 aButton.setText("");
                 bButton.setText("");
                 aButton.setBackgroundResource(R.drawable.outline_play_circle);
                 bButton.setBackgroundResource(R.drawable.outline_cancel);
                 changeState(State.pause);
             } else{
-                log.add('i', "buttonA", "Resume button is pushed");
+                Log.add('i', "buttonA", "Resume button is pushed");
                 aButton.setText("");
                 bButton.setText("");
                 aButton.setBackgroundResource(R.drawable.round_pause_circle);
@@ -428,21 +364,21 @@ public class MainActivity extends AppCompatActivity {
 
         private void buttonBonClick(){
             if(state == State.ready){
-                log.add('i', "buttonB", "BG button is pushed");
+                Log.add('i', "buttonB", "BG button is pushed");
                 aButton.setText("");
                 bButton.setText("");
                 aButton.setBackgroundResource(R.drawable.round_pause_circle);
                 bButton.setBackgroundResource(R.drawable.outline_cancel);
                 changeState(State.running);
             } else if(state == State.running){
-                log.add('i', "buttonB", "Stop button is pushed");
+                Log.add('i', "buttonB", "Stop button is pushed");
                 aButton.setText("FG");
                 bButton.setText("Bg");
                 aButton.setBackgroundResource(R.drawable.baseline);
                 bButton.setBackgroundResource(R.drawable.baseline);
                 changeState(State.ready);
             } else{
-                log.add('i', "buttonB", "Stop button is pushed");
+                Log.add('i', "buttonB", "Stop button is pushed");
                 aButton.setText("FG");
                 bButton.setText("Bg");
                 aButton.setBackgroundResource(R.drawable.baseline);
