@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Callback{
     Handler mHandler = new Handler();
     Monitor monitor;
     Log log;
@@ -151,6 +151,10 @@ public class MainActivity extends AppCompatActivity {
         alertDialogBuilder.show();
     }
 
+    public void setValue(double heat, double temp, double disassembly){
+        value.setValues(heat, temp, disassembly);
+    }
+
     //FG, BG, pause, cancel 버튼에 반응해서 상태 변경 및 실행
     private void changeState(State state){
         if(state == State.ready){
@@ -253,9 +257,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     class Value{
-        View heatting;
-        View temper;
-        View height;
+        View heatting, temper, height;
+        TextView heattingValue, temperValue, heightValue;
+        double heat, temp, disassembly;
 
         public Value(){
             heatting = (View) findViewById(R.id.heattingtime);
@@ -263,8 +267,7 @@ public class MainActivity extends AppCompatActivity {
             heattingColorView.setBackgroundColor(getResources().getColor(R.color.colorGreenDark));
             TextView heattingTitle = (TextView) heatting.findViewById(R.id.settingtitle);
             heattingTitle.setText("Heatting Time");
-            TextView heattingValue = (TextView) heatting.findViewById(R.id.settingvalue);
-            heattingValue.setText("0");
+            heattingValue = (TextView) heatting.findViewById(R.id.settingvalue);
             TextView heattingUnit = (TextView) heatting.findViewById(R.id.settingunit);
             heattingUnit.setText("s");
 
@@ -273,8 +276,7 @@ public class MainActivity extends AppCompatActivity {
             temperColorView.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             TextView temperTitle = (TextView) temper.findViewById(R.id.settingtitle);
             temperTitle.setText("Temperature");
-            TextView temperValue = (TextView) temper.findViewById(R.id.settingvalue);
-            temperValue.setText("0");
+            temperValue = (TextView) temper.findViewById(R.id.settingvalue);
             TextView temperUnit = (TextView) temper.findViewById(R.id.settingunit);
             temperUnit.setText("°C");
 
@@ -283,10 +285,19 @@ public class MainActivity extends AppCompatActivity {
             heightColorView.setBackgroundColor(getResources().getColor(R.color.colorGreenWhite));
             TextView heightTitle = (TextView) height.findViewById(R.id.settingtitle);
             heightTitle.setText("Disassembly Height");
-            TextView heightValue = (TextView) height.findViewById(R.id.settingvalue);
-            heightValue.setText("0");
+            heightValue = (TextView) height.findViewById(R.id.settingvalue);
             TextView heightUnit = (TextView) height.findViewById(R.id.settingunit);
             heightUnit.setText("mm");
+        }
+
+        public void setValues(double heat, double temp, double disassembly){
+            this.heat = heat;
+            this.temp = temp;
+            this.disassembly = disassembly;
+
+            heattingValue.setText(Double.toString(heat));
+            temperValue.setText(Double.toString(temp));
+            heightValue.setText(Double.toString(disassembly));
         }
     }
 
@@ -387,4 +398,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 }
