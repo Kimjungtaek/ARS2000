@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <include layout="@layout/status"
-        android:id="@+id/status"
+    <RelativeLayout
+        android:id="@+id/statusframe"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>

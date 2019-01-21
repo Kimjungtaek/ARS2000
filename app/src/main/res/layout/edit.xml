@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical" >
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:textSize="30sp"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="@color/stateTextColor"
+        android:padding="10dp"
+        android:id="@+id/title"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:background="@color/colorPrimary"
+        android:padding="10dp">
+        <EditText
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:textSize="30sp"
+            android:background="#FFFFFF"
+            android:id="@+id/value"
+            android:inputType="numberDecimal"
+            android:layout_weight="1"/>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:background="#FFFFFF">
+            <Button
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:background="#777777"
+                android:id="@+id/upButton"
+                android:layout_weight="1"
+                android:text="up"/>
+            <Button
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:background="#777777"
+                android:id="@+id/downButton"
+                android:layout_weight="1"
+                android:text="down"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

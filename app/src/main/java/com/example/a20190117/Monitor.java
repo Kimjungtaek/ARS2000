@@ -10,20 +10,20 @@ import android.widget.Button;
 
 public class Monitor extends Fragment {
     View view;
-    View status;
+    Status status;
     Fixing fixing;
     Heating heating;
     Vacuum vacuum;
     Disassembly disassembly;
     Release release;
-    int state = 0;
+    int measure;
 
     ButtonListener buttonListener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         view = inflater.inflate(R.layout.monitorframe, container, false);
-        status = view.findViewById(R.id.status);
+        status = new Status();
         fixing = new Fixing();
         heating = new Heating();
         vacuum = new Vacuum();
@@ -32,22 +32,26 @@ public class Monitor extends Fragment {
         buttonListener = new ButtonListener();
 
         FragmentTransaction childFt = getChildFragmentManager().beginTransaction();
-        childFt.add(R.id.measureframe, fixing)
+        childFt.add(R.id.statusframe, status)
+                .show(status)
+                .add(R.id.measureframe, fixing)
                 .add(R.id.measureframe, heating)
                 .add(R.id.measureframe, vacuum)
                 .add(R.id.measureframe, disassembly)
                 .add(R.id.measureframe, release)
                 .commit();
 
-        setMeasure(state);
-
         return view;
     }
 
-    public void setValue(double xSetting, double ySetting, double zSetting, double temp){
+    //초기화
+    public void set(double xSetting, double ySetting, double zSetting, double temp){
+        measure = 0;
+        setMeasure(measure);
+        status.set();
         fixing.set(xSetting, ySetting);
         heating.set(temp);
-        //vacuum 압력값이 필요하면 래퍼런스랑 함수 추가
+        vacuum.set(zSetting);
         disassembly.set(zSetting);
         release.set(xSetting, ySetting);
     }
@@ -55,14 +59,14 @@ public class Monitor extends Fragment {
     public void setMeasure(int n){
         FragmentTransaction childFt = getChildFragmentManager().beginTransaction();
 
-        state = n;
+        measure = n;
 
         Button left = (Button) view.findViewById(R.id.leftButton);
         left.setVisibility(View.VISIBLE);
         Button right = (Button) view.findViewById(R.id.rightButton);
         right.setVisibility(View.VISIBLE);
 
-        switch(state){
+        switch(measure){
             case 0:
                 childFt.show(fixing)
                         .hide(heating)
@@ -123,10 +127,10 @@ public class Monitor extends Fragment {
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.leftButton:
-                    setMeasure(--state);
+                    setMeasure(--measure);
                     break;
                 case R.id.rightButton:
-                    setMeasure(++state);
+                    setMeasure(++measure);
                     break;
             }
         }

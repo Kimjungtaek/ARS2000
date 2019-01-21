@@ -18,7 +18,7 @@ public class Fixing extends Fragment {
 
     ProgressBar progressX, progressY;
     TextView xText, yText;
-    double xValue = 0, yValue = 0, xSetting, ySetting;
+    double xValue, yValue, xSetting, ySetting;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,8 +38,16 @@ public class Fixing extends Fragment {
     }
 
     public void set(double xSetting, double ySetting){
+        this.xValue = 0;
         this.xSetting = xSetting;
+        progressX.setProgress((int) xValue);
+        progressX.setMax((int) xSetting);
+        xText.setText(xValue + " / " + xSetting + "mm");
+        this.yValue = 0;
         this.ySetting = ySetting;
+        progressY.setProgress((int) yValue);
+        progressY.setMax((int) ySetting);
+        yText.setText(yValue + " / " + ySetting + "mm");
     }
 
     public void run(){
@@ -54,9 +62,9 @@ public class Fixing extends Fragment {
     class ThisTimerTask extends TimerTask {
         public void run() {
             progressX.setProgress((int) xValue);
-            xText.setText(xValue + " / " + xSetting);
+            xText.setText(xValue + " / " + xSetting + "mm");
             progressY.setProgress((int) yValue);
-            yText.setText(yValue + " / " + ySetting);
+            yText.setText(yValue + " / " + ySetting + "mm");
         }
     }
 }

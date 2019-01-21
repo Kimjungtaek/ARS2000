@@ -131,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements Callback{
     //에러 표시 dialog
     public void error(String errorText) {
         //모두 정지
+        timeMeasureTimer.pause();
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
         alertDialogBuilder.setTitle("Error")
                 .setMessage("error : " + errorText)
@@ -139,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements Callback{
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         //다시 시작
+                        timeMeasureTimer.resume();
                     }
                 /*
                 })
@@ -153,8 +155,8 @@ public class MainActivity extends AppCompatActivity implements Callback{
     }
 
     public void setValue(double xSetting, double ySetting, double zSetting, double temp){
-        value.setValue(xSetting, ySetting, zSetting, temp);
-        monitor.setValue(xSetting, ySetting, zSetting, temp);
+        value.set(xSetting, ySetting, zSetting, temp);
+        monitor.set(xSetting, ySetting, zSetting, temp);
     }
 
     //FG, BG, pause, cancel 버튼에 반응해서 상태 변경 및 실행
@@ -162,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements Callback{
         if(state == State.ready){
             Log.add('i', "main", "All process is stoped");
             //멈추었을 때 행동
+            setting.setEditable(true);
             timeMeasureTimer.stop();
             this.state = State.ready;
         }
@@ -180,6 +183,8 @@ public class MainActivity extends AppCompatActivity implements Callback{
         else {
             Log.add('i', "main", "Process is started");
             //처음 시작했을 때 행동
+            setting.setEditable(false);
+            setting.dataToMain();
             timeMeasureTimer.start();
             this.state = State.running;
         }
@@ -283,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements Callback{
             heightUnit.setText("mm");
         }
 
-        public void setValue(double xSetting, double ySetting, double zSetting, double temp){
+        public void set(double xSetting, double ySetting, double zSetting, double temp){
             this.xSetting = xSetting;
             this.ySetting = ySetting;
             this.zSetting = zSetting;
