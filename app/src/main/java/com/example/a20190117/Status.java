@@ -49,8 +49,34 @@ public class Status extends Fragment {
         while(release.getChildCount() != 1) release.removeViewAt(1);
     }
 
-    public void setLayout(int n){
+    public void run(int n){
         layout = n;
+        if(layout == 0){
+            setRunning(fixT);
+        } else if(layout == 1){
+            setRunning(heatT);
+        } else if(layout == 2){
+            setRunning(vacuumT);
+        } else if(layout == 3){
+            setRunning(disT);
+        } else if(layout == 4){
+            setRunning(releaseT);
+        }
+    }
+
+    public void done(int n){
+        layout = n;
+        if(layout == 0){
+            setDone(fixT);
+        } else if(layout == 1){
+            setDone(heatT);
+        } else if(layout == 2){
+            setDone(vacuumT);
+        } else if(layout == 3){
+            setDone(disT);
+        } else if(layout == 4){
+            setDone(releaseT);
+        }
     }
 
     public void update(String string){
@@ -79,6 +105,10 @@ public class Status extends Fragment {
         text.setTextSize(15);
         text.setTextColor(getResources().getColor(R.color.colorPrimaryText));
         linear.addView(text, params);
+    }
+
+    private void setLayout(int n){
+        layout = n;
     }
 
     private void setReady(TextView t){

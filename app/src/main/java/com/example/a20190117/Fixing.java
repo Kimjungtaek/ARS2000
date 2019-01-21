@@ -1,7 +1,6 @@
 package com.example.a20190117;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,12 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class Fixing extends Fragment {
     View view;
-    Timer timer;
 
     ProgressBar progressX, progressY;
     TextView xText, yText;
@@ -35,6 +30,10 @@ public class Fixing extends Fragment {
     public void update(double xValue, double yValue){
         this.xValue = xValue;
         this.yValue = yValue;
+        progressX.setProgress((int) xValue);
+        xText.setText(xValue + " / " + xSetting + "mm");
+        progressY.setProgress((int) yValue);
+        yText.setText(yValue + " / " + ySetting + "mm");
     }
 
     public void set(double xSetting, double ySetting){
@@ -48,23 +47,5 @@ public class Fixing extends Fragment {
         progressY.setProgress((int) yValue);
         progressY.setMax((int) ySetting);
         yText.setText(yValue + " / " + ySetting + "mm");
-    }
-
-    public void run(){
-        timer = new Timer();
-        timer.schedule(new ThisTimerTask(),200,100);
-    }
-
-    public void stop(){
-        timer.cancel();
-    }
-
-    class ThisTimerTask extends TimerTask {
-        public void run() {
-            progressX.setProgress((int) xValue);
-            xText.setText(xValue + " / " + xSetting + "mm");
-            progressY.setProgress((int) yValue);
-            yText.setText(yValue + " / " + ySetting + "mm");
-        }
     }
 }

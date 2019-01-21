@@ -8,12 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class Heating extends Fragment {
     View view;
-    Timer timer;
 
     ProgressBar progress;
     TextView text;
@@ -31,6 +27,8 @@ public class Heating extends Fragment {
 
     public void update(double temp){
         this.temp = temp;
+        progress.setProgress((int) temp);
+        text.setText(temp + " / " + setting + "°C");
     }
 
     public void set(double setting){
@@ -39,21 +37,5 @@ public class Heating extends Fragment {
         progress.setProgress((int) temp);
         progress.setMax((int) setting);
         text.setText(temp + " / " + setting + "°C");
-    }
-
-    public void run(){
-        timer = new Timer();
-        timer.schedule(new ThisTimerTask(),200, 100);
-    }
-
-    public void stop(){
-        timer.cancel();
-    }
-
-    class ThisTimerTask extends TimerTask {
-        public void run() {
-            progress.setProgress((int) temp);
-            text.setText(temp + " / " + setting + "°C");
-        }
     }
 }

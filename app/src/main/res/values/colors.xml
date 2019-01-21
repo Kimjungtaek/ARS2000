@@ -12,6 +12,9 @@
     <color name="colorGreenDark">#045D56</color>
     <color name="colorGreen">#1EB980</color>
     <color name="colorGreenWhite">#37EFBA</color>
+    <color name="vacuumColor">#0000FF</color>
+    <color name="vacuumOnColor">#00FF00</color>
+    <color name="vacuumOffColor">#FF0000</color>
     <color name="stateTextColor">#000000</color>
     <color name="dateTimeColor">#FFFFFF</color>
     <color name="buttonunclicked">#B1B1B5</color>

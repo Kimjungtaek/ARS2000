@@ -8,17 +8,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class Setting extends Fragment {
     View view;
-    View xedit, yedit, zedit, tedit;
-    EditText xValue, yValue, zValue, tValue;
-    Button confirm, xup, xdown, yup, ydown, zup, zdown, tup, tdown;
+    Edit xedit, yedit, zedit, tedit;
+    Button confirm;
 
     boolean editable = true;
     double xSetting, ySetting, zSetting, temp;
-    ButtonListener buttonListener;
 
     Callback callback;
 
@@ -26,24 +23,18 @@ public class Setting extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         view = inflater.inflate(R.layout.settingframe, container, false);
 
-        xedit = (View) view.findViewById(R.id.xsetting);
-        TextView xtitle = (TextView) xedit.findViewById(R.id.title);
-        xtitle.setText("xSetting");
-        xValue = (EditText) xedit.findViewById(R.id.value);
-        yedit = (View) view.findViewById(R.id.ysetting);
-        TextView ytitle = (TextView) yedit.findViewById(R.id.title);
-        ytitle.setText("ySetting");
-        yValue = (EditText) yedit.findViewById(R.id.value);
-        zedit = (View) view.findViewById(R.id.zsetting);
-        TextView ztitle = (TextView) zedit.findViewById(R.id.title);
-        ztitle.setText("zSetting");
-        zValue = (EditText) zedit.findViewById(R.id.value);
-        tedit = (View) view.findViewById(R.id.temp);
-        TextView ttitle = (TextView) tedit.findViewById(R.id.title);
-        ttitle.setText("temp");
-        tValue = (EditText) tedit.findViewById(R.id.value);
+        xedit = new Edit(R.id.xsetting,"xSetting");
+        yedit = new Edit(R.id.ysetting, "ySetting");
+        zedit = new Edit(R.id.zsetting, "zSetting");
+        tedit = new Edit(R.id.temp, "Temperature");
 
-        buttonListener = new ButtonListener();
+        confirm = (Button) view.findViewById(R.id.confirm);
+        confirm.setOnClickListener(new Button.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                setValues();
+            }
+        });
 
         callback = (Callback) getActivity();
 
@@ -66,15 +57,17 @@ public class Setting extends Fragment {
         zSetting = 50;
         temp = 100;
 
-        xValue.setText(Double.toString(xSetting));
-        yValue.setText(Double.toString(ySetting));
-        zValue.setText(Double.toString(zSetting));
-        tValue.setText(Double.toString(temp));
+        xedit.set(xSetting);
+        yedit.set(ySetting);
+        zedit.set(zSetting);
+        tedit.set(temp);
     }
 
     //파일로 저장 하는 함수 xml 저장 버튼에 반응
     private void setValues(){
-        //텍스트들 읽어서 파일로 저장
+        // 텍스트들 읽어서 파일로 저장
+        // xedit.get() 등등
+        // xml 파싱으로 파일로
         dataToMain();
     }
 
@@ -86,60 +79,46 @@ public class Setting extends Fragment {
         else{
             confirm.setVisibility(view.INVISIBLE);
         }
-
     }
-    class ButtonListener implements Button.OnClickListener{
-        public ButtonListener(){
-            confirm = view.findViewById(R.id.confirm);
-            confirm.setOnClickListener(this);
-            xup = xedit.findViewById(R.id.upButton);
-            xup.setOnClickListener(this);
-            xdown = xedit.findViewById(R.id.downButton);
-            xdown.setOnClickListener(this);
-            yup = yedit.findViewById(R.id.upButton);
-            yup.setOnClickListener(this);
-            ydown = yedit.findViewById(R.id.downButton);
-            ydown.setOnClickListener(this);
-            zup = zedit.findViewById(R.id.upButton);
-            zup.setOnClickListener(this);
-            zdown = zedit.findViewById(R.id.downButton);
-            zdown.setOnClickListener(this);
-            tup = tedit.findViewById(R.id.upButton);
-            tup.setOnClickListener(this);
-            tdown = tedit.findViewById(R.id.downButton);
-            tdown.setOnClickListener(this);
+
+    class Edit implements Button.OnClickListener{
+        View edit;
+        TextView title;
+        EditText text;
+        Button up, down;
+        double value;
+
+        public Edit(int id, String titleName){
+            edit = view.findViewById(id);
+            title = edit.findViewById(R.id.title);
+            text = edit.findViewById(R.id.value);
+            up = edit.findViewById(R.id.upButton);
+            down = edit.findViewById(R.id.downButton);
+
+            up.setOnClickListener(this);
+            down.setOnClickListener(this);
+
+            title.setText(titleName);
+        }
+
+        public double get(){
+            return value;
+        }
+
+        public void set(double d){
+            value = d;
+            text.setText("" + d);
         }
 
         @Override
         public void onClick(View v) {
-            if(v.getId() == R.id.confirm){
-                setValues();
-            } else if(v.getId() == xup.getId()){
-                double d = Double.parseDouble(xValue.getText().toString()) + 1;
-                xValue.setText(Double.toString(d));
-            } else if(v.getId() == xdown.getId()){
-                double d = Double.parseDouble(xValue.getText().toString()) - 1;
-                xValue.setText(Double.toString(d));
-            } else if(v.getId() == yup.getId()){
-                double d = Double.parseDouble(yValue.getText().toString()) + 1;
-                yValue.setText(Double.toString(d));
-            } else if(v.getId() == ydown.getId()){
-                double d = Double.parseDouble(yValue.getText().toString()) - 1;
-                yValue.setText(Double.toString(d));
-            } else if(v.getId() == zup.getId()){
-                double d = Double.parseDouble(zValue.getText().toString()) + 1;
-                zValue.setText(Double.toString(d));
-            } else if(v.getId() == zdown.getId()){
-                double d = Double.parseDouble(zValue.getText().toString()) - 1;
-                zValue.setText(Double.toString(d));
-            } else if(v.getId() == tup.getId()){
-                double d = Double.parseDouble(tValue.getText().toString()) + 1;
-                tValue.setText(Double.toString(d));
-            } else if(v.getId() == tdown.getId()){
-                double d = Double.parseDouble(tValue.getText().toString()) - 1;
-                tValue.setText(Double.toString(d));
+            if(v.getId() == R.id.upButton){
+                double d = Double.parseDouble(text.getText().toString()) + 1;
+                text.setText("" + d);
+            } else if(v.getId() == R.id.downButton){
+                double d = Double.parseDouble(text.getText().toString()) - 1;
+                text.setText("" + d);
             }
         }
     }
-
 }

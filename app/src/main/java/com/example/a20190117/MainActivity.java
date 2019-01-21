@@ -334,6 +334,7 @@ public class MainActivity extends AppCompatActivity implements Callback{
                     setMonitor(2);
                     break;
                 case R.id.inButton :
+                    monitor.startSimul();
                     break;
                 case R.id.outButton :
                     break;
